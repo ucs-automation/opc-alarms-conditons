@@ -36,7 +36,7 @@ public sealed class OpcUaClientService : IHostedService, IDisposable
 	/// <summary>
 	/// Constructor
 	/// </summary>
-	/// <param name="logger">Logger that will be used for loggin</param>
+	/// <param name="logger">Logger that will be used for logging</param>
 	public OpcUaClientService(ILogger<OpcUaClientService> logger)
 	{
 		_logger = logger;
