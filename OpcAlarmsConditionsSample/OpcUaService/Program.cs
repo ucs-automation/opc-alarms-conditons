@@ -19,7 +19,7 @@ if (!EnvVars.Ensure())
 }
 
 // Host builder
-IHost host = Host.CreateDefaultBuilder(args)
+var host = Host.CreateDefaultBuilder(args)
 	.ConfigureServices(services =>
 	{
 		services.AddLogging(options =>
