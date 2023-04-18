@@ -9,17 +9,6 @@ namespace OpcUaService;
 public sealed class OpcUaClientService : IHostedService, IDisposable
 {
 	/// <summary>
-	/// Stores the namespace information used by the client to access the server.
-	/// </summary>
-	private static readonly OpcNamespace Namespace 
-		= OpcNamespace.Get(2);
-
-	/// <summary>
-	/// Stores the node identifier of the root node of the machine node the client operate on.
-	/// </summary>
-	private static readonly OpcNodeId MachineId = Namespace.GetId("Machine_1");
-	
-	/// <summary>
 	/// Used to log messages
 	/// </summary>
 	private readonly ILogger<OpcUaClientService> _logger;
