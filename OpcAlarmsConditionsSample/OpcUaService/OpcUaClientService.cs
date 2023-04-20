@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Opc.UaFx;
 using Opc.UaFx.Client;
+using OpcUaService.Models;
 
 namespace OpcUaService;
 
@@ -48,6 +49,7 @@ public sealed class OpcUaClientService : IHostedService, IDisposable
 		_logger.LogInformation("Opc service wird gestartet..");
 
 		_opcClient = new OpcClient(EnvReader.GetStringValue(EnvVars.EndpointUrlEnvVar), new OpcSecurityPolicy(OpcSecurityMode.None));
+		_opcClient.UseDynamic = true;
 		
 		_opcClient.Connected += OpcClientOnConnected;
 		_opcClient.Disconnected += OpcClientOnDisconnected;
@@ -88,7 +90,8 @@ public sealed class OpcUaClientService : IHostedService, IDisposable
 		{
 			if (!OpcNodeId.IsNullOrEmpty(nodeId))
 			{
-				_eventSubscriptions = _opcClient?.SubscribeEvent(nodeId, filter, OnOpcEventReceived);
+				//_eventSubscriptions = _opcClient?.SubscribeEvent(nodeId, filter, OnOpcEventReceived);
+				_eventSubscriptions = _opcClient?.SubscribeEvent(nodeId, OnOpcEventReceived);
 				
 				_eventSubscriptions?.RefreshConditions();
 
@@ -123,16 +126,57 @@ public sealed class OpcUaClientService : IHostedService, IDisposable
 
 		switch (alarmEvent)
 		{
+			case GenericEvent genericEvent:
+				Print(genericEvent.GetData());
+				break;
 			case OpcAlarmCondition opcCondition:
 				_logger.LogWarning("Nachricht: {Nachricht}", opcCondition.Message);
 				_logger.LogWarning("Quittiert: {Quittiert}, Steht an: {StehtAn}", opcCondition.IsAcked, opcCondition.IsActive);
 				break;
-			// case not null:
-			// 	_logger.LogWarning("Nachricht: {Nachricht}", alarmEvent.Message);
-			// 	break;
-			// default:
-			// 	_logger.LogWarning("Alarmtyp nicht bekannt: {AlarmTyp}", alarmEvent.GetType().Name);
-			// 	break;
+		}
+	}
+	
+	private static void Print(Dictionary<string, object>? data, int level = 0)
+	{
+		if (data == null) 
+			throw new ArgumentNullException(nameof(data));
+		
+		var indent = new string('.', level * 2);
+
+		foreach (var item in data)
+		{
+			switch (item.Value)
+			{
+				case OpcDataObject instance:
+				{
+					Console.WriteLine(indent + item.Key);
+
+					var instanceData = instance.GetFields().ToDictionary(
+						field => field.Name,
+						field => field.Value);
+
+					Print(instanceData, level + 1);
+					break;
+				}
+				case OpcDataObject[] instances:
+				{
+					for (var index = 0; index < instances.Length; index++) 
+					{
+						Console.WriteLine(indent + "{0}[{1}]", item.Key, index);
+
+						var instanceData = instances[index].GetFields().ToDictionary(
+							field => field.Name,
+							field => field.Value);
+
+						Print(instanceData, level + 1);
+					}
+
+					break;
+				}
+				default:
+					Console.WriteLine(indent + "{0} = {1}", item.Key, item.Value);
+					break;
+			}
 		}
 	}
 	
