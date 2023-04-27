@@ -1,6 +1,7 @@
 using dotenv.net.Utilities;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Opc.Ua;
 using Opc.UaFx;
 using Opc.UaFx.Client;
 using OpcUaService.Models;
@@ -49,7 +50,7 @@ public sealed class OpcUaClientService : IHostedService, IDisposable
 		_logger.LogInformation("Opc service wird gestartet..");
 
 		_opcClient = new OpcClient(EnvReader.GetStringValue(EnvVars.EndpointUrlEnvVar), new OpcSecurityPolicy(OpcSecurityMode.None));
-		_opcClient.UseDynamic = true;
+		//_opcClient.UseDynamic = true;
 		
 		_opcClient.Connected += OpcClientOnConnected;
 		_opcClient.Disconnected += OpcClientOnDisconnected;
@@ -74,6 +75,8 @@ public sealed class OpcUaClientService : IHostedService, IDisposable
 	{
 		_logger.LogInformation("Verbindung zum OPC UA Server wurde hergestellt.");
 		
+		OpcEvent.RegisterType<GenericEvent>("ns=3;i=1804");
+		
 		// Build the filter for the events
 		var filter = OpcFilter.Using(_opcClient)
 			.FromEvents(
@@ -91,9 +94,10 @@ public sealed class OpcUaClientService : IHostedService, IDisposable
 			if (!OpcNodeId.IsNullOrEmpty(nodeId))
 			{
 				//_eventSubscriptions = _opcClient?.SubscribeEvent(nodeId, filter, OnOpcEventReceived);
-				_eventSubscriptions = _opcClient?.SubscribeEvent(nodeId, OnOpcEventReceived);
-				
+				_eventSubscriptions = _opcClient?.SubscribeEvent(ObjectIds.Server, OnOpcEventReceived);
+
 				_eventSubscriptions?.RefreshConditions();
+				_eventSubscriptions?.ApplyChanges();
 
 				_logger.LogInformation("Event subscription wurde erstellt.");	
 			}
@@ -122,16 +126,28 @@ public sealed class OpcUaClientService : IHostedService, IDisposable
 	
 	private void OnOpcEventReceived(object sender, OpcEventReceivedEventArgs e)
 	{
+		_logger.LogInformation("Event empfangen");
+		
 		var alarmEvent = e.Event;
 
 		switch (alarmEvent)
 		{
-			case GenericEvent genericEvent:
-				Print(genericEvent.GetData());
-				break;
-			case OpcAlarmCondition opcCondition:
-				_logger.LogWarning("Nachricht: {Nachricht}", opcCondition.Message);
-				_logger.LogWarning("Quittiert: {Quittiert}, Steht an: {StehtAn}", opcCondition.IsAcked, opcCondition.IsActive);
+			// case GenericEvent genericEvent:
+			// 	Print(genericEvent.GetData());
+			// 	break;
+			//
+			// case OpcAlarmCondition opcCondition:
+			// 	_logger.LogWarning("Nachricht: {Nachricht}", opcCondition.Message);
+			// 	_logger.LogWarning("Quittiert: {Quittiert}, Steht an: {StehtAn}", opcCondition.IsAcked, opcCondition.IsActive);
+			// 	break;
+			
+			// case OpcAlarmCondition opcCondition:
+			// 	_logger.LogWarning("Nachricht: {Nachricht}", opcCondition.Message);
+			// 	_logger.LogWarning("Quittiert: {Quittiert}, Steht an: {StehtAn}", opcCondition.IsAcked, opcCondition.IsActive);
+			// 	break;
+			
+			case SimaticAlarmConditionType simaticEvent:
+				_logger.LogWarning("Simatic event Nachricht: {Nachricht}", simaticEvent.Message);
 				break;
 		}
 	}

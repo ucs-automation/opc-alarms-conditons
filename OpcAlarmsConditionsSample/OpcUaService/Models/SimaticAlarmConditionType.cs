@@ -1,17 +1,15 @@
-using Opc.UaFx;
+﻿using Opc.UaFx;
 
 namespace OpcUaService.Models;
 
-[OpcEventType("ns=3;i=1804")]
-
-public class SimaticEventType : OpcEvent
+[OpcEventType("ns=3;i=1805")]
+public class SimaticAlarmConditionType : OpcAlarmCondition
 {
-	/// <inheritdoc />
-	public SimaticEventType(IOpcReadOnlyNodeDataStore dataStore) : base(dataStore)
-	{
-	}
-
-	private static readonly OpcName AssociatedValueName01 = new("3:AssociatedValue_01");
+    public SimaticAlarmConditionType(IOpcReadOnlyNodeDataStore dataStore) : base(dataStore)
+    {
+    }
+    
+    private static readonly OpcName AssociatedValueName01 = new("3:AssociatedValue_01");
 	private static readonly OpcName AssociatedValueName02 = new("AssociatedValue_02", 3);
 	private static readonly OpcName AssociatedValueName03 = new("AssociatedValue_03", 3);
 	private static readonly OpcName AssociatedValueName04 = new("AssociatedValue_04", 3);
@@ -32,4 +30,5 @@ public class SimaticEventType : OpcEvent
 	public SimaticAssociatedAlarmValue AssociatedAlarmValue08 => DataStore.Get<SimaticAssociatedAlarmValue>(AssociatedValueName08);
 	public SimaticAssociatedAlarmValue AssociatedAlarmValue09 => DataStore.Get<SimaticAssociatedAlarmValue>(AssociatedValueName09);
 	public SimaticAssociatedAlarmValue AssociatedAlarmValue10 => DataStore.Get<SimaticAssociatedAlarmValue>(AssociatedValueName10);
+
 }
