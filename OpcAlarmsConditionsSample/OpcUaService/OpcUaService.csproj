@@ -19,12 +19,12 @@
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
       <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
-      <PackageReference Include="Opc.UaFx.Client" Version="2.30.0" />
+      <PackageReference Include="Opc.UaFx.Client" Version="2.29.0" />
     </ItemGroup>
 
     <ItemGroup>
       <None Update=".env">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
 
