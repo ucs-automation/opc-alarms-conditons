@@ -9,7 +9,7 @@ public sealed class OpcClient : IDisposable
 	/// <summary>
 	/// Logger for the OpcClient
 	/// </summary>
-	private readonly ILogger<OpcClient> _logger;
+	private readonly ILogger _logger;
 
 	/// <summary>
 	/// The application configuration to use for the client.
@@ -65,7 +65,7 @@ public sealed class OpcClient : IDisposable
 	/// Constructor for building the OpcClient.
 	/// </summary>
 	/// <param name="logger">The logger used for logging the state</param>
-	public OpcClient(ILogger<OpcClient> logger)
+	public OpcClient(ILogger logger)
 	{
 		_logger = logger;
 		_configuration = new ApplicationConfiguration
@@ -246,6 +246,34 @@ public sealed class OpcClient : IDisposable
 			_logger.LogWarning("Untrusted Certificate rejected. Subject = {0}", e.Certificate.Subject);
 		}
 	}
+
+#region Subscriptions
+
+	public async Task SubscribeEvent()
+	{
+		if (_session is null || !_session.Connected)
+			throw new InvalidOperationException("The session is not connected");
+
+		Subscription subscription = new()
+		{
+			DisplayName = null,
+			PublishingInterval = 1000,
+			KeepAliveCount = 10,
+			LifetimeCount = 100,
+			MaxNotificationsPerPublish = 1000,
+			PublishingEnabled = true,
+			TimestampsToReturn = TimestampsToReturn.Both
+		};
+		
+		_session.AddSubscription(subscription);
+		await subscription.CreateAsync();
+
+		Dictionary<NodeId, NodeId> eventTypeMappings = new();
+		FilterDefinition 
+
+	}
+
+#endregion
 	
 	/// <inheritdoc />
 	public void Dispose()

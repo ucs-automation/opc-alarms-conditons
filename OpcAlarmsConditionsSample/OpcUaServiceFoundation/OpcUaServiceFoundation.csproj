@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <RootNamespace>OpcUaService</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -19,7 +20,6 @@
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
       <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
-      <PackageReference Include="Opc.UaFx.Client" Version="2.29.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -31,5 +31,5 @@
     <ItemGroup>
       <ProjectReference Include="..\JbiOpcUa\JbiOpcUa.csproj" />
     </ItemGroup>
-
+    
 </Project>
